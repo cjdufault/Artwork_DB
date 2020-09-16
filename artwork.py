@@ -23,10 +23,20 @@ def main():
         
         # run function corresponding to selection if selection in range
         if 0 < selection < 10:
-            menu_options[selection]()
+            response = menu_options[selection]()
+            
+            # response is (response string, returned rows)
+            if response[1] != None:
+                print('\n' + response[0])
+                for record in response[1]:
+                    print('\t' + str(record))
+            else:
+                print('\n' + response[0])
+            print()
+            
         else:
-            running = False # quit
-    
+            running = False # quit if selection is 0 (or something out of range for some reason)
+            
 
 def menu():
     while True:
@@ -51,23 +61,41 @@ def menu():
         
 
 def all_artworks():
+    rows_returned = Artwork.select()
+    
+    if len(rows_returned) > 0:
+        return 'All artworks:', rows_returned
+    else:
+        return 'No artworks found.', None
+
+
+def search_by_title(title=None):
+    if title == None:
+        title = input('Title:  ')
+    
+    rows_returned = Artwork.select().where(Artwork.title.contains(title))
+    
+    if len(rows_returned) > 0:
+        return 'Search results:', rows_returned
+    else:
+        return 'No artworks found.', None
+    
+    
+def search_by_artist(artist=None):
     print('not implemented')
-def search_by_title():
+def add_artist(name=None, email=None):
     print('not implemented')
-def search_by_artist():
+def add_artwork(artist=None, title=None, price=None, available=None):
     print('not implemented')
-def add_artist():
+def update_email(artist=None, email=None):
     print('not implemented')
-def add_artwork():
+def update_availability(artwork=None, available=None):
     print('not implemented')
-def update_email():
+def delete_artist(artist=None):
     print('not implemented')
-def update_availability():
+def delete_artwork(artwork=None):
     print('not implemented')
-def delete_artist():
-    print('not implemented')
-def delete_artwork():
-    print('not implemented')
+    
 
 class Artist(Model):
     name = CharField(unique=True)
@@ -78,6 +106,7 @@ class Artist(Model):
     
     def __str__(self):
         return f'{self.name} ({self.email})'
+    
 
 class Artwork(Model):
     artist = ForeignKeyField(Artist, backref='artworks') # link artwork to artist
@@ -94,7 +123,8 @@ class Artwork(Model):
         else:
             available_or_sold = 'Sold'
             
-        return f'"{self.title}" by {self.artist}: {available_or_sold} for {self.price}'
+        # ex: "Jimson Weed/White Flower No. 1" by Georgia O'Keefe: Sold for $44,400,000.00
+        return f'"{self.title}" by {self.artist}: {available_or_sold} for ${self.price:.2f}'
     
 
 if __name__ == '__main__':
