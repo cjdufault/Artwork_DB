@@ -94,7 +94,14 @@ def search_by_artist(artist=None):
     
     
 def add_artist(name=None, email=None):
+    if name == None:
+        name = input('Name:  ')
+    if email == None:
+        email = input('Email:  ')
+    
     print('not implemented')
+    
+    
 def add_artwork(artist=None, title=None, price=None, available=None):
     print('not implemented')
 def update_email(artist=None, email=None):
