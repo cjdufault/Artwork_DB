@@ -8,18 +8,24 @@ def main():
     db.connect()
     db.create_tables([Artist, Artwork])
     
-    menu_options = {
-        1: all_artworks,
-        2: search_by_title,
-        3: search_by_artist,
-        4: add_artist,
-        5: add_artwork,
-        6: update_email,
-        7: update_availability,
-        8: delete_artist,
-        9: delete_artwork
-        }
-    selection = menu()
+    running = True
+    while running:
+        menu_options = {1: all_artworks,
+                        2: search_by_title,
+                        3: search_by_artist,
+                        4: add_artist,
+                        5: add_artwork,
+                        6: update_email,
+                        7: update_availability,
+                        8: delete_artist,
+                        9: delete_artwork}
+        selection = menu()
+        
+        # run function corresponding to selection if selection in range
+        if 0 < selection < 10:
+            menu_options[selection]()
+        else:
+            running = False # quit
     
 
 def menu():
@@ -45,14 +51,23 @@ def menu():
         
 
 def all_artworks():
+    print('not implemented')
 def search_by_title():
+    print('not implemented')
 def search_by_artist():
+    print('not implemented')
 def add_artist():
+    print('not implemented')
 def add_artwork():
+    print('not implemented')
 def update_email():
+    print('not implemented')
 def update_availability():
+    print('not implemented')
 def delete_artist():
+    print('not implemented')
 def delete_artwork():
+    print('not implemented')
 
 class Artist(Model):
     name = CharField(unique=True)
