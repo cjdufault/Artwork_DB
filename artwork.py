@@ -5,7 +5,8 @@ db = SqliteDatabase('artworks_db.sqlite')
 
 
 def main():
-    
+    db.connect()
+    db.create_tables([Artist, Artwork])
     
 
 class Artist(Model):
@@ -22,21 +23,19 @@ class Artwork(Model):
     artist = CharField()    # foreign key
     title = CharField()
     price = FloatField()
-    
-    # value of 1 indicates artwork is available, 0 indicates artwork is sold
-    available = IntegerField(
-        constraints=[sqlite3('CHECK available = 0 or available = 1')]
+    available = BooleanField()
     
     class Meta:
         database = db
         
     def __str__(self):
-        if self.available == 0:
-            available_or_sold = 'Sold'
-        else:
+        if self.available:
             available_or_sold = 'Available'
+        else:
+            available_or_sold = 'Sold'
+            
         return f'"{self.title}" by {self.artist}: {available_or_sold} for {self.price}'
     
 
-if __name__ == '__main__'
+if __name__ == '__main__':
     main()
