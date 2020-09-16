@@ -20,7 +20,7 @@ class Artist(Model):
         return f'{self.name} ({self.email})'
 
 class Artwork(Model):
-    artist = CharField()    # foreign key
+    artist = ForeignKeyField(Artist, backref='artworks') # link artwork to artist
     title = CharField()
     price = FloatField()
     available = BooleanField()
