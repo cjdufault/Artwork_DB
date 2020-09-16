@@ -82,7 +82,17 @@ def search_by_title(title=None):
     
     
 def search_by_artist(artist=None):
-    print('not implemented')
+    if artist == None:
+        artist = input('Artist:  ')
+    
+    rows_returned = Artwork.select().where(Artwork.artist.contains(artist))
+    
+    if len(rows_returned) > 0:
+        return 'Search results:', rows_returned
+    else:
+        return 'No artworks found.', None
+    
+    
 def add_artist(name=None, email=None):
     print('not implemented')
 def add_artwork(artist=None, title=None, price=None, available=None):
