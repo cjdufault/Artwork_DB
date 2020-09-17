@@ -61,7 +61,7 @@ def menu():
         
 
 def all_artworks():
-    rows_returned = Artwork.select().order_by(Artwork.artist)
+    rows_returned = Artwork.select().order_by(Artwork.artist.name)
     
     if len(rows_returned) > 0:
         return 'All artworks:', rows_returned
@@ -79,7 +79,7 @@ def all_artists():
 
 
 def search_by_title(title=None):
-    if title == None:
+    if title == None or type(title) != str:
         title = input('Title:  ')
     
     rows_returned = Artwork.select().where(Artwork.title.contains(title))
@@ -91,27 +91,30 @@ def search_by_title(title=None):
     
     
 def search_by_artist(artist_name=None):
-    if artist_name == None:
+    if artist_name == None or type(artist_name) != str:
         artist_name = input('Artist:  ')
     
     artist = Artist.get_or_none(Artist.name == artist_name)
-    artworks = artist.artworks
+    if artist != None:
+        artworks = artist.artworks
     
-    if len(artworks) > 0:
-        return 'Search results:', artworks
+        if len(artworks) > 0:
+            return 'Search results:', artworks
+        else:
+            return 'No artworks found', None
     else:
-        return 'No artworks found', None
+        return 'Artist not found', None
     
     
 def add_artist(name=None, email=None):
-    if name == None:
+    if name == None or type(name) != str:
         name = input('Artist\'s Name:  ')
-    if email == None:
+    if email == None or type(email) != str:
         email = input('Artist\'s email address:  ')
     
     try:
         artist = Artist.create(name=name, email=email)
-        return f'Added {name} to database', [artist]
+        return f'Added {name} to database:', [artist]
         
     except IntegrityError as e:
         print(e)
@@ -119,7 +122,7 @@ def add_artist(name=None, email=None):
     
     
 def add_artwork(artist_name=None, title=None, price=None, available=None):
-    if artist_name == None:
+    if artist_name == None or type(artist_name) != str:
         artist_name = input('Artist\'s name:  ')
         
     # check if artist object already exists
@@ -128,11 +131,11 @@ def add_artwork(artist_name=None, title=None, price=None, available=None):
         print(f'No existing info for {artist_name}. Creating entry for {artist_name}:')
         artist = add_artist(name=artist_name)[1][0]
         
-    if title == None:
+    if title == None or type(title) != str:
         title = input('Title of artwork:  ')
-    if price == None:
+    if price == None or type(price) != int:
         price = int_input('Price: $', 'Invalid input\n')
-    if available == None:
+    if available == None or type(available) != bool:
         available = yes_no('Available for sale? Yes/No:  ', 'Invalid input\n')
         
     try:
@@ -146,9 +149,9 @@ def add_artwork(artist_name=None, title=None, price=None, available=None):
     
     
 def update_email(artist_name=None, email=None):
-    if artist_name == None:
-        name = input('Artist\'s Name:  ')
-    if email == None:
+    if artist_name == None or type(artist_name) != str:
+        artist_name = input('Artist\'s Name:  ')
+    if email == None or type(email) != str:
         email = input('Artist\'s email address:  ')
         
     artist = Artist.get_or_none(Artist.name == artist_name)
@@ -163,10 +166,10 @@ def update_email(artist_name=None, email=None):
     
     
 def update_availability(title=None, available=None):
-    if title == None:
+    if title == None or type(title) != str:
         title = input('Title of artwork:  ')
     if available == None or type(available) != bool:
-        available = yes_no('Available for sale?', 'Invalid input\n')
+        available = yes_no('Available for sale? Yes/No:  ', 'Invalid input\n')
     
     artwork = Artwork.get_or_none(Artwork.title == title)
     if artwork != None:
@@ -184,7 +187,26 @@ def update_availability(title=None, available=None):
     
     
 def delete_artist(artist_name=None):
-    print('not implemented')
+    if artist_name == None or type(artist_name) != str:
+        artist_name = input('Artist\'s name:  ')
+        
+    artist = Artist.get_or_none(Artist.name == artist_name)
+    if artist != None:
+        confirm = yes_no('WARNING: this will delete all artworks by this artist as well. Proceed? Yes/No:  ',
+                         'Invalid input\n')
+        
+        if confirm:
+            Artwork.delete().where(Artwork.artist == artist).execute()
+            Artist.delete().where(Artist.name == artist_name).execute()
+            
+            return f'Deleted {artist_name} and of their artworks', None
+        
+        return 'Canceled deletion', None
+    
+    else:
+        return 'Artist not found', None
+    
+    
 def delete_artwork(title=None):
     print('not implemented')
     
@@ -228,7 +250,7 @@ class Artist(BaseModel):
 class Artwork(BaseModel):
     artist = ForeignKeyField(Artist, backref='artworks') # link artwork to artist
     title = CharField()
-    price = FloatField()
+    price = IntegerField()
     available = BooleanField()
         
     def __str__(self):
