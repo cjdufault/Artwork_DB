@@ -11,9 +11,9 @@ def main():
     running = True
     while running:
         menu_options = {1: all_artworks,
-                        2: search_by_title,
-                        3: search_by_artist,
-                        4: search_for_artist,
+                        2: all_artists,
+                        3: search_by_title,
+                        4: search_by_artist,
                         5: add_artwork,
                         6: update_email,
                         7: update_availability,
@@ -41,9 +41,9 @@ def main():
 def menu():
     while True:
         print('1. View all artworks')
-        print('2. Search artworks by title')
-        print('3. Search artworks by artist')
-        print('4. Search for an artist')
+        print('2. View all artists')
+        print('3. Search artworks by title')
+        print('4. Search artworks by artist')
         print('5. Add an artwork')
         print('6. Update artist email')
         print('7. Update artwork availablity')
@@ -67,6 +67,15 @@ def all_artworks():
         return 'All artworks:', rows_returned
     else:
         return 'No artworks found', None
+    
+
+def all_artists():
+    rows_returned = Artist.select().order_by(Artist.name)
+    
+    if len(rows_returned) > 0:
+        return 'All artists:', rows_returned
+    else:
+        return 'No artists found', None
 
 
 def search_by_title(title=None):
@@ -92,18 +101,6 @@ def search_by_artist(artist_name=None):
         return 'Search results:', artworks
     else:
         return 'No artworks found', None
-    
-    
-def search_for_artist(artist_name=None):
-    if artist_name == None:
-        artist_name = input('Artist:  ')
-    
-    rows_returned = Artist.select().where(Artist.name.contains(artist_name))
-    
-    if len(rows_returned) > 0:
-        return 'Search results:', rows_returned
-    else:
-        return 'No artists found', None
     
     
 def add_artist(name=None, email=None):
