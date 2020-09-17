@@ -155,13 +155,34 @@ def update_email(artist_name=None, email=None):
     if artist != None:
         artist.email = email
         artist.save()
+        
         return f'Updated {artist_name}\'s email address to {email}', None
+    
     else:
         return f'No artist named {artist_name}', None
     
     
 def update_availability(title=None, available=None):
-    print('not implemented')
+    if title == None:
+        title = input('Title of artwork:  ')
+    if available == None or type(available) != bool:
+        available = yes_no('Available for sale?', 'Invalid input\n')
+    
+    artwork = Artwork.get_or_none(Artwork.title == title)
+    if artwork != None:
+        artwork.available = available
+        artwork.save()
+        if available:
+            available_or_sold = 'Available'
+        else:
+            available_or_sold = 'Sold'
+            
+        return f'Updated availablity of "{title}" to {available_or_sold}', None
+    
+    else:
+        return f'No artwork titled {title}', None
+    
+    
 def delete_artist(artist_name=None):
     print('not implemented')
 def delete_artwork(title=None):
