@@ -145,13 +145,26 @@ def add_artwork(artist_name=None, title=None, price=None, available=None):
     return 'Failed to add artwork', None
     
     
-def update_email(artist=None, email=None):
+def update_email(artist_name=None, email=None):
+    if artist_name == None:
+        name = input('Artist\'s Name:  ')
+    if email == None:
+        email = input('Artist\'s email address:  ')
+        
+    artist = Artist.get_or_none(Artist.name == artist_name)
+    if artist != None:
+        artist.email = email
+        artist.save()
+        return f'Updated {artist_name}\'s email address to {email}', None
+    else:
+        return f'No artist named {artist_name}', None
+    
+    
+def update_availability(title=None, available=None):
     print('not implemented')
-def update_availability(artwork=None, available=None):
+def delete_artist(artist_name=None):
     print('not implemented')
-def delete_artist(artist=None):
-    print('not implemented')
-def delete_artwork(artwork=None):
+def delete_artwork(title=None):
     print('not implemented')
     
 
