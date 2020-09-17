@@ -81,23 +81,24 @@ def search_by_title(title=None):
         return 'No artworks found', None
     
     
-def search_by_artist(artist=None):
-    if artist == None:
-        artist = input('Artist:  ')
+def search_by_artist(artist_name=None):
+    if artist_name == None:
+        artist_name = input('Artist:  ')
     
-    rows_returned = Artwork.select().where(Artwork.artist.contains(artist))
+    artist = Artist.get_or_none(Artist.name == artist_name)
+    artworks = artist.artworks
     
-    if len(rows_returned) > 0:
-        return 'Search results:', rows_returned
+    if len(artworks) > 0:
+        return 'Search results:', artworks
     else:
         return 'No artworks found', None
     
     
-def search_for_artist(artist=None):
-    if artist == None:
-        artist = input('Artist:  ')
+def search_for_artist(artist_name=None):
+    if artist_name == None:
+        artist_name = input('Artist:  ')
     
-    rows_returned = Artist.select().where(Artist.name.contains(artist))
+    rows_returned = Artist.select().where(Artist.name.contains(artist_name))
     
     if len(rows_returned) > 0:
         return 'Search results:', rows_returned
@@ -128,7 +129,7 @@ def add_artwork(artist_name=None, title=None, price=None, available=None):
     artist = Artist.get_or_none(Artist.name == artist_name)
     if artist == None:
         print(f'No existing info for {artist_name}. Creating entry for {artist_name}:')
-        artist = add_artist(name=artist)[0][1]
+        artist = add_artist(name=artist_name)[1][0]
         
     if title == None:
         title = input('Title of artwork:  ')
