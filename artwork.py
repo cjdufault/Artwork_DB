@@ -48,10 +48,9 @@ def menu():
         print('6. Update artist email')
         print('7. Update artwork availablity')
         print('8. Delete an artist')
-        print('9. Delete an artwork')
+        print('9. Delete artwork')
         print('0. Quit')
         response = int_input('Make a selection:  ', 'Invalid selection\n')
-        
         
         selection = int(response)
         if selection >= 0 and selection <= 9:
@@ -207,8 +206,27 @@ def delete_artist(artist_name=None):
         return 'Artist not found', None
     
     
-def delete_artwork(title=None):
-    print('not implemented')
+def delete_artwork(artist_name=None, title=None):
+    if title == None or type(title) != str:
+        title = input('Title of artwork:  ')
+    
+    matching_titles = Artwork.select().where(Artwork.title == title)
+    
+    if len(matching_titles) > 0:
+        
+        deleted_art = []
+        for artwork in matching_titles:
+            confirm = yes_no(f'Would you like to delete "{artwork.title}" by {artwork.artist.name}? Yes/No:  ',
+                            'Invalid input\n')
+            
+            if confirm:
+                deleted_art.append(artwork)
+                Artwork.delete().where(Artwork.artwork_id == artwork.artwork_id).execute()
+                            
+        return 'Deleted:', deleted_art
+        
+    else:
+        return 'Artwork not found', None
     
 
 def int_input(prompt, invalid_message):
@@ -240,6 +258,7 @@ class BaseModel(Model):
 
 
 class Artist(BaseModel):
+    artist_id = IntegerField(primary_key=True)
     name = CharField(unique=True)
     email = CharField()
     
@@ -248,6 +267,7 @@ class Artist(BaseModel):
     
 
 class Artwork(BaseModel):
+    artwork_id = IntegerField(primary_key=True)
     artist = ForeignKeyField(Artist, backref='artworks') # link artwork to artist
     title = CharField()
     price = IntegerField()
