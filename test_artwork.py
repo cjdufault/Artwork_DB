@@ -179,6 +179,7 @@ class TestArtwork(unittest.TestCase):
         self.assertEqual(expected_rows_from_db_query, len(db_query), 'Failed: add_artwork added duplicate artist')
 
 
+# fill db with known values
 def populate_db():
     frida = Artist(name='Frida Kahlo', email='freeds1907@correo.mx')
     claude = Artist(name='Claude Monet', email='ocmoney@poste.fr')
@@ -195,6 +196,7 @@ def populate_db():
     haystacks.save()
     
 
+# clear all tables in db
 def clear_db():
     Artwork.delete().execute()
     Artist.delete().execute()

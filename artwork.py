@@ -191,14 +191,17 @@ def update_availability(title=None, available=None):
         return f'No artwork titled {title}', None
     
     
-def delete_artist(artist_name=None):
+def delete_artist(artist_name=None, override_warning=False):
     if artist_name == None or type(artist_name) != str:
         artist_name = input('Artist\'s name:  ')
         
     artist = Artist.get_or_none(Artist.name == artist_name)
     if artist != None:
-        confirm = yes_no('WARNING: this will delete all artworks by this artist as well. Proceed? Yes/No:  ',
-                         'Invalid input\n')
+        if override_warning:
+            confirm = True
+        else:
+            confirm = yes_no('WARNING: this will delete all artworks by this artist as well. Proceed? Yes/No:  ',
+                            'Invalid input\n')
         
         if confirm:
             Artwork.delete().where(Artwork.artist == artist).execute()
@@ -212,7 +215,7 @@ def delete_artist(artist_name=None):
         return 'Artist not found', None
     
     
-def delete_artwork(artist_name=None, title=None):
+def delete_artwork(artist_name=None, title=None, override_warning=False):
     if title == None or type(title) != str:
         title = input('Title of artwork:  ')
     
@@ -222,8 +225,11 @@ def delete_artwork(artist_name=None, title=None):
         
         deleted_art = []
         for artwork in matching_titles:
-            confirm = yes_no(f'Would you like to delete "{artwork.title}" by {artwork.artist.name}? Yes/No:  ',
-                            'Invalid input\n')
+            if override_warning:
+                confirm = True
+            else:
+                confirm = yes_no(f'Would you like to delete "{artwork.title}" by {artwork.artist.name}? Yes/No:  ',
+                                'Invalid input\n')
             
             if confirm:
                 deleted_art.append(artwork)
