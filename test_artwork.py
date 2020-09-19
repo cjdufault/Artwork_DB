@@ -20,7 +20,6 @@ class TestArtwork(unittest.TestCase):
         clear_db()
         
         expected_message = 'No artworks found'
-        expected_rows_returned = 0
         response = all_artworks()
         
         assert response[0] == expected_message
@@ -41,7 +40,6 @@ class TestArtwork(unittest.TestCase):
         clear_db()
         
         expected_message = 'No artists found'
-        expected_rows_returned = 0
         response = all_artists()
         
         assert response[0] == expected_message
@@ -62,12 +60,32 @@ class TestArtwork(unittest.TestCase):
         clear_db()
         
         expected_message = 'No artworks found'
-        expected_rows_returned = 0
         response = search_by_title(title='The Persistence of Memory')
         
         assert response[0] == expected_message
         self.assertIsNone(response[1])
         
+    def test_search_by_artist(self):
+        clear_db()
+        populate_db()
+        
+        expected_message = 'Search results:'
+        expected_rows_returned = 2
+        response = search_by_title(artist_name='Claude Monet')
+        
+        assert response[0] == expected_message
+        assert len(response[1]) == expected_rows_returned
+        
+    def test_search_by_artist_not_found(self):
+        clear_db()
+        
+        expected_message = 'No artworks found'
+        response = search_by_title(artist_name='Michelangelo Merisi da Caravaggio')
+        
+        assert response[0] == expected_message
+        self.assertIsNone(response[1])
+        
+
 
 def populate_db():
     frida = Artist(name='Frida Kahlo', email='freeds1907@correo.mx')
