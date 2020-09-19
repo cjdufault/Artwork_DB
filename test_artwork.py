@@ -57,7 +57,17 @@ class TestArtwork(unittest.TestCase):
         response = search_by_title(title='lilies')
         
         assert response[0] == expected_message
-        assert len(response[1]) == expected_rows_returned 
+        assert len(response[1]) == expected_rows_returned
+        
+    def test_search_by_title_not_found():
+        clear_db()
+        
+        expected_message = 'No artworks found'
+        expected_rows_returned = 0
+        response = search_by_title(title='The Persistence of Memory')
+        
+        assert response[0] == expected_message
+        assert len(response[1]) == expected_rows_returned
         
 
 def populate_db():
