@@ -145,7 +145,7 @@ def add_artwork(artist_name=None, title=None, price=None, available=None):
         
     try:
         artwork = Artwork.create(artist=artist, title=title, price=price, available=available)
-        return f'Added artwork to database:', [artwork]
+        return 'Added artwork to database:', [artwork]
         
     except IntegrityError as e:
         print(e)
@@ -275,7 +275,7 @@ class Artist(BaseModel):
 class Artwork(BaseModel):
     artwork_id = IntegerField(primary_key=True)
     artist = ForeignKeyField(Artist, backref='artworks') # link artwork to artist
-    title = CharField()
+    title = CharField(unique=True)
     price = IntegerField()
     available = BooleanField()
         
