@@ -185,9 +185,9 @@ class TestArtwork(unittest.TestCase):
         
         new_email = 'fridas.new.email@hotmail.com'
         update_email(artist_name='Frida Kahlo', email=new_email)
-        frida = Artist.select().where(Artist.name == 'Frida Kahlo')
+        db_query = Artist.select().where(Artist.email == new_email)
         
-        self.assertEqual(frida.email, new_email, 'Failed: update_email didn\'t update the email correctly')
+        self.assertEqual(len(db_query), 1, 'Failed: update_email didn\'t update the email correctly')
         
     # change email for an artist not in db
     def test_update_email_not_in_db(self):
@@ -198,7 +198,7 @@ class TestArtwork(unittest.TestCase):
         response = update_email(artist_name='Vincent Van Gogh', email='vinnie_goes@post.nl')
         db_query = Artist.select().where(Artist.email == 'vinnie_goes@post.nl')
         
-        self.assertEqual(expected_message, response[0], 'Failed: update_email returned the wrong message')
+        self.assertEqual(expected_message, response[0], 'Failed: update_email returned the wrong status message')
         self.assertEqual(expected_rows_from_db_query, len(db_query), 
                          'Failed: update_email updated an email address when the specified artist wasn\'t in db')
     
@@ -207,10 +207,10 @@ class TestArtwork(unittest.TestCase):
         clear_db()
         populate_db()
         
-        update_availability(title='The Broken Column', available=True)
-        roots = Artwork.select().where(Artwork.title == 'Roots')
+        update_availability(title='Roots', available=True)
+        db_query = Artwork.select().where(Artwork.title == 'Roots' and Artwork.available)
         
-        self.assertTrue(roots.available, 'Failed: update_availability didn\'t update availability correctly')
+        self.assertEqual(len(db_query), 1, 'Failed: update_availability didn\'t update availability correctly')
         
     # change availability of artwork not in db
     def test_update_availability_not_in_db(self):
@@ -221,6 +221,46 @@ class TestArtwork(unittest.TestCase):
         response = update_availability(title='The Broken Column', available=True)
         
         self.assertEqual(expected_message, response[0], 'Failed: update_availability returned the wrong message')
+        
+    # delete artist and all their work
+    def test_delete_artist(self):
+        clear_db()
+        populate_db()
+        
+        delete_artist(artist_name='Claude Monet', override_warning=True)
+        artist_query = Artist.select().where(Artist.name == 'Claude Monet')
+        artwork_query = Artwork.select().where(Artwork.artist.name == 'Claude Monet')
+        
+        self.assertEqual(len(artist_query), 0, 'Failed: delete_artist didn\'t delete artist correctly')
+        self.assertEqual(len(artwork_query), 0, 'Failed: delete_artist didn\'t all of the artist\'s artworks')
+    
+    # delete artist not in db
+    def test_delete_artist_not_in_db(self):
+        clear_db()
+        
+        expected_message = 'Artist not found'
+        response = delete_artist(artist_name='Rembrandt', override_warning=True)
+        
+        self.assertEqual(expected_message, response[0], 'Failed: delete_artist returned the wrong status message')
+    
+    # delete an Artwork
+    def test_delete_artwork(self):
+        clear_db()
+        populate_db()
+        
+        delete_artwork(artist_name='Claude Monet', title='Water Lilies', override_warning=True)
+        db_query = Artwork.select().where(Artwork.title == 'Water Lilies')
+        
+        self.assertEqual(len(db_query), 0, 'Failed: delete_artwork didn\'t delete the artwork')
+        
+    # try to delete artwork not in db
+    def test_delete_artwork_not_in_db(self):
+        clear_db()
+        
+        expected_message = 'Artwork not found'
+        response = delete_artwork(artist_name='Frida Kahlo', title='Memory, the Heart', override_warning=True)
+        
+        self.assertEqual(expected_message, response[0], 'Failed: delete_artwork returned the wrong status message')
 
 
 # fill db with known values
@@ -250,5 +290,4 @@ if __name__ == '__main__':
     db.connect()
     db.create_tables([Artist, Artwork])
     unittest.main()
-    clear_db()
     db.close()
