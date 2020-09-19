@@ -114,6 +114,19 @@ class TestArtwork(unittest.TestCase):
         self.assertIsNone(response[1],
                           'Failed: search_by_artist returned rows from the db when it shouldn\'t have')
         
+    # search for available art by an artist
+    def test_available_by_artist(self):
+        clear_db()
+        populate_db()
+        
+        expected_message = 'Available artworks:'
+        expected_rows_returned = 1
+        response = available_by_artist(artist_name='Frida Kahlo')
+        
+        self.assertEqual(response[0], expected_message, 'Failed: available_by_artist returned the wrong status message')
+        self.assertEqual(len(response[1]), expected_rows_returned,
+                         'Failed: available_by_artist returned the wrong number of rows')
+        
     # add an artist to db
     def test_add_artist(self):
         clear_db()
@@ -270,7 +283,7 @@ def populate_db():
     frida.save()
     claude.save()
     
-    roots = Artwork(artist=frida, title='Roots', price=5616000, available=False)
+    roots = Artwork(artist=frida, title='Roots', price=5616000, available=True)
     self_portrait = Artwork(artist=frida, title='Self Portrait with Curly Hair', price=1351500, available=False)
     lilies = Artwork(artist=claude, title='Water Lilies', price=54000000, available=False)
     haystacks = Artwork(artist=claude, title='Haystacks', price=110700000, available=False)

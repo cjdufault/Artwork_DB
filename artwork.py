@@ -18,15 +18,16 @@ def main():
                         2: all_artists,
                         3: search_by_title,
                         4: search_by_artist,
-                        5: add_artwork,
-                        6: update_email,
-                        7: update_availability,
-                        8: delete_artist,
-                        9: delete_artwork}
+                        5: available_by_artist,
+                        6: add_artwork,
+                        7: update_email,
+                        8: update_availability,
+                        9: delete_artist,
+                        10: delete_artwork}
         selection = menu()
         
         # run function corresponding to selection if selection in range
-        if 0 < selection < 10:
+        if 0 < selection <= 10:
             response = menu_options[selection]()
             
             # response is (response string, returned rows)
@@ -46,20 +47,21 @@ def main():
 
 def menu():
     while True:
-        print('1. View all artworks')
-        print('2. View all artists')
-        print('3. Search artworks by title')
-        print('4. Search artworks by artist')
-        print('5. Add an artwork')
-        print('6. Update artist email')
-        print('7. Update artwork availablity')
-        print('8. Delete an artist')
-        print('9. Delete artwork')
-        print('0. Quit')
+        print(' 1. View all artworks')
+        print(' 2. View all artists')
+        print(' 3. Search artworks by title')
+        print(' 4. Search artworks by artist')
+        print(' 5. Search available artworks by artist')
+        print(' 6. Add an artwork')
+        print(' 7. Update artist email')
+        print(' 8. Update artwork availablity')
+        print(' 9. Delete an artist')
+        print('10. Delete artwork')
+        print(' 0. Quit')
         response = int_input('Make a selection:  ', 'Invalid selection\n')
         
         selection = int(response)
-        if selection >= 0 and selection <= 9:
+        if 0 <= selection <= 10:
             return selection
         
         print('Invalid selection\n')
@@ -105,6 +107,23 @@ def search_by_artist(artist_name=None):
     
         if len(artworks) > 0:
             return 'Search results:', artworks
+        else:
+            return 'No artworks found', None
+    else:
+        return 'Artist not found', None
+    
+
+# just get available artworks by a given artist
+def available_by_artist(artist_name=None):
+    if artist_name == None or type(artist_name) != str:
+        artist_name = input('Artist:  ')
+    
+    artist = Artist.get_or_none(Artist.name == artist_name)
+    if artist != None:
+        artworks = Artwork.select().where(Artwork.artist == artist and Artwork.available)
+    
+        if len(artworks) > 0:
+            return 'Available artworks:', artworks
         else:
             return 'No artworks found', None
     else:
@@ -245,7 +264,7 @@ def int_input(prompt, invalid_message):
     while True:
         response = input(prompt)
 
-        if response.isdigit():
+        if response.isnumeric():
             return int(response)
         else:
             print(invalid_message)
