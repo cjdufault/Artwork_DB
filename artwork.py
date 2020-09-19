@@ -1,7 +1,11 @@
 from peewee import *
 
 
-db = SqliteDatabase('artworks_db.sqlite', pragmas={'foreign_keys': 1})
+# open the test database if the program has been imported by the test program
+if __name__ == 'artwork':
+    db = SqliteDatabase('test_artworks_db.sqlite', pragmas={'foreign_keys': 1})
+else:
+    db = SqliteDatabase('artworks_db.sqlite', pragmas={'foreign_keys': 1})
 
 
 def main():
