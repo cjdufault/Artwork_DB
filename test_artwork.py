@@ -16,6 +16,16 @@ class TestArtwork(unittest.TestCase):
         assert response[0] == expected_message
         assert len(response[1]) == expected_rows_returned
         
+    def test_all_artworks_empty_db(self):
+        clear_db()
+        
+        expected_message = 'No artworks found'
+        expected_rows_returned = 0
+        response = all_artworks()
+        
+        assert response[0] == expected_message
+        assert len(response[1]) == expected_rows_returned
+        
     def test_all_artists(self):
         clear_db()
         populate_db()
@@ -26,6 +36,28 @@ class TestArtwork(unittest.TestCase):
         
         assert response[0] == expected_message
         assert len(response[1]) == expected_rows_returned
+        
+    def test_all_artists_empty_db(self):
+        clear_db()
+        populate_db()
+        
+        expected_message = 'No artists found'
+        expected_rows_returned = 0
+        response = all_artist()
+        
+        assert response[0] == expected_message
+        assert len(response[1]) == expected_rows_returned
+        
+    def test_search_by_title():
+        clear_db()
+        populate_db()
+        
+        expected_message = 'Search results:'
+        expected_rows_returned = 1
+        response = search_by_title(title='lilies')
+        
+        assert response[0] == expected_message
+        assert len(response[1]) == expected_rows_returned 
         
 
 def populate_db():

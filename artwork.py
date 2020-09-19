@@ -83,9 +83,9 @@ def all_artists():
 
 def search_by_title(title=None):
     if title == None or type(title) != str:
-        title = input('Title:  ')
+        title = input('Title:  ').lower()
     
-    rows_returned = Artwork.select().where(Artwork.title.contains(title))
+    rows_returned = Artwork.select().where(Artwork.title.lower().contains(title))
     
     if len(rows_returned) > 0:
         return 'Search results:', rows_returned
