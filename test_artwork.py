@@ -16,6 +16,17 @@ class TestArtwork(unittest.TestCase):
         assert response[0] == expected_message
         assert len(response[1]) == expected_rows_returned
         
+    def test_all_artists(self):
+        clear_db()
+        populate_db()
+        
+        expected_message = 'All artists:'
+        expected_rows_returned = 2
+        response = all_artist()
+        
+        assert response[0] == expected_message
+        assert len(response[1]) == expected_rows_returned
+        
 
 def populate_db():
     frida = Artist(name='Frida Kahlo', email='freeds1907@correo.mx')
