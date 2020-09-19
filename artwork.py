@@ -204,7 +204,7 @@ def delete_artist(artist_name=None):
             Artwork.delete().where(Artwork.artist == artist).execute()
             Artist.delete().where(Artist.name == artist_name).execute()
             
-            return f'Deleted {artist_name} and of their artworks', None
+            return f'Deleted {artist_name} and all of their artworks', None
         
         return 'Canceled deletion', None
     
@@ -285,8 +285,8 @@ class Artwork(BaseModel):
         else:
             available_or_sold = 'Sold'
             
-        # ex: "Jimson Weed/White Flower No. 1" by Georgia O'Keefe: Sold for $44,400,000.00
-        return f'"{self.title}" by {self.artist}: {available_or_sold} for ${self.price:.2f}'
+        # ex: "Jimson Weed/White Flower No. 1" by Georgia O'Keefe: Sold for $44,400,000
+        return f'"{self.title}" by {self.artist}: {available_or_sold} for ${self.price}'
 
 
 if __name__ == '__main__':

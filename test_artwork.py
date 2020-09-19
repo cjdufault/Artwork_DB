@@ -5,6 +5,7 @@ import unittest
 
 class TestArtwork(unittest.TestCase):
     
+    # get all artworks in db
     def test_all_artworks(self):
         clear_db()
         populate_db()
@@ -13,18 +14,20 @@ class TestArtwork(unittest.TestCase):
         expected_rows_returned = 4
         response = all_artworks()
         
-        assert response[0] == expected_message
-        assert len(response[1]) == expected_rows_returned
+        self.assertEqual(response[0], expected_message)
+        self.assertEqual(len(response[1]), expected_rows_returned)
         
+    # try to get all artworks from an empty db
     def test_all_artworks_empty_db(self):
         clear_db()
         
         expected_message = 'No artworks found'
         response = all_artworks()
         
-        assert response[0] == expected_message
+        self.assertEqual(response[0], expected_message)
         self.assertIsNone(response[1])
         
+    # get all artists from db
     def test_all_artists(self):
         clear_db()
         populate_db()
@@ -33,18 +36,20 @@ class TestArtwork(unittest.TestCase):
         expected_rows_returned = 2
         response = all_artists()
         
-        assert response[0] == expected_message
-        assert len(response[1]) == expected_rows_returned
+        self.assertEqual(response[0], expected_message)
+        self.assertEqual(len(response[1]), expected_rows_returned)
         
+    # try to get all artists from an empty db
     def test_all_artists_empty_db(self):
         clear_db()
         
         expected_message = 'No artists found'
         response = all_artists()
         
-        assert response[0] == expected_message
+        self.assertEqual(response[0], expected_message)
         self.assertIsNone(response[1])
         
+    # search for an artwork whose title contains a string
     def test_search_by_title(self):
         clear_db()
         populate_db()
@@ -53,38 +58,81 @@ class TestArtwork(unittest.TestCase):
         expected_rows_returned = 1
         response = search_by_title(title='lilies')
         
-        assert response[0] == expected_message
-        assert len(response[1]) == expected_rows_returned
+        self.assertEqual(response[0], expected_message)
+        self.assertEqual(len(response[1]), expected_rows_returned)
         
+    # search by title for an artwork not in db
     def test_search_by_title_not_found(self):
         clear_db()
         
         expected_message = 'No artworks found'
         response = search_by_title(title='The Persistence of Memory')
         
-        assert response[0] == expected_message
+        self.assertEqual(response[0], expected_message)
         self.assertIsNone(response[1])
         
+    # search for all art by an artist
     def test_search_by_artist(self):
         clear_db()
         populate_db()
         
         expected_message = 'Search results:'
         expected_rows_returned = 2
-        response = search_by_title(artist_name='Claude Monet')
+        response = search_by_artist(artist_name='Claude Monet')
         
-        assert response[0] == expected_message
-        assert len(response[1]) == expected_rows_returned
+        self.assertEqual(response[0], expected_message)
+        self.assertEqual(len(response[1]), expected_rows_returned)
         
-    def test_search_by_artist_not_found(self):
+    # search by artist w/ an artist not in db
+    def test_search_by_artist_artist_not_in_db(self):
         clear_db()
         
-        expected_message = 'No artworks found'
-        response = search_by_title(artist_name='Michelangelo Merisi da Caravaggio')
+        expected_message = 'Artist not found'
+        response = search_by_artist(artist_name='Michelangelo Merisi da Caravaggio')
         
-        assert response[0] == expected_message
+        self.assertEqual(response[0], expected_message)
+        self.assertIsNone(response[1])
+    
+    # search by artist for an artist w/ no artworks
+    def test_search_by_artist_artist_has_no_art(self):
+        clear_db()
+        degas = Artist(name='Edgar Degas', email='degas_in_detank@aol.com')
+        degas.save()
+        
+        expected_message = 'No artworks found'
+        response = search_by_artist(artist_name='Edgar Degas')
+        
+        self.assertEqual(response[0], expected_message)
         self.assertIsNone(response[1])
         
+    # add an artist to db
+    def test_add_artist(self):
+        clear_db()
+        
+        expected_message = 'Added Hokusai to database:'
+        hokusai_str = 'Hokusai (makinwaves@yubinbutsu.jp)'
+        expected_rows_from_db_query = 1
+        response = add_artist(name='Hokusai', email='makinwaves@yubinbutsu.jp')
+        db_query = Artist.select().where(Artist.name == 'Hokusai')
+        
+        self.assertEqual(expected_message, response[0])
+        self.assertEqual(hokusai_str, str(response[1][0]))  # test artist string is returned
+        self.assertEqual(len(db_query), expected_rows_from_db_query)
+        
+    
+    # add duplicate artist; user has no way of doing this directly, but it's good to test
+    def test_add_artist_duplicate(self):
+        clear_db()
+        populate_db()
+        
+        expected_message = 'Failed to add artist'
+        expected_rows_from_db_query = 1
+        response = add_artist(name='Frida Kahlo', email='freeds1907@correo.mx')
+        db_query = Artist.select().where(Artist.name == 'Frida Kahlo')
+        
+        self.assertEqual(expected_message, response[0])
+        self.assertIsNone = (response[1])
+        self.assertEqual(len(db_query), expected_rows_from_db_query)
 
 
 def populate_db():
