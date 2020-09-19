@@ -3,9 +3,9 @@ from peewee import *
 
 # open the test database if the program has been imported by the test program
 if __name__ == 'artwork':
-    db = SqliteDatabase('test_artworks_db.sqlite', pragmas={'foreign_keys': 1})
+    db = SqliteDatabase('test_artwork_db.sqlite', pragmas={'foreign_keys': 1})
 else:
-    db = SqliteDatabase('artworks_db.sqlite', pragmas={'foreign_keys': 1})
+    db = SqliteDatabase('artwork_db.sqlite', pragmas={'foreign_keys': 1})
 
 
 def main():
@@ -40,6 +40,8 @@ def main():
             
         else:
             running = False # quit if selection is 0 (or something out of range for some reason)
+            
+    db.close()
             
 
 def menu():
@@ -83,9 +85,9 @@ def all_artists():
 
 def search_by_title(title=None):
     if title == None or type(title) != str:
-        title = input('Title:  ').lower()
+        title = input('Title:  ')
     
-    rows_returned = Artwork.select().where(Artwork.title.lower().contains(title))
+    rows_returned = Artwork.select().where(Artwork.title.contains(title))
     
     if len(rows_returned) > 0:
         return 'Search results:', rows_returned

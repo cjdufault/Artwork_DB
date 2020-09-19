@@ -24,7 +24,7 @@ class TestArtwork(unittest.TestCase):
         response = all_artworks()
         
         assert response[0] == expected_message
-        assert len(response[1]) == expected_rows_returned
+        self.assertIsNone(response[1])
         
     def test_all_artists(self):
         clear_db()
@@ -32,23 +32,22 @@ class TestArtwork(unittest.TestCase):
         
         expected_message = 'All artists:'
         expected_rows_returned = 2
-        response = all_artist()
+        response = all_artists()
         
         assert response[0] == expected_message
         assert len(response[1]) == expected_rows_returned
         
     def test_all_artists_empty_db(self):
         clear_db()
-        populate_db()
         
         expected_message = 'No artists found'
         expected_rows_returned = 0
-        response = all_artist()
+        response = all_artists()
         
         assert response[0] == expected_message
-        assert len(response[1]) == expected_rows_returned
+        self.assertIsNone(response[1])
         
-    def test_search_by_title():
+    def test_search_by_title(self):
         clear_db()
         populate_db()
         
@@ -59,7 +58,7 @@ class TestArtwork(unittest.TestCase):
         assert response[0] == expected_message
         assert len(response[1]) == expected_rows_returned
         
-    def test_search_by_title_not_found():
+    def test_search_by_title_not_found(self):
         clear_db()
         
         expected_message = 'No artworks found'
@@ -67,7 +66,7 @@ class TestArtwork(unittest.TestCase):
         response = search_by_title(title='The Persistence of Memory')
         
         assert response[0] == expected_message
-        assert len(response[1]) == expected_rows_returned
+        self.assertIsNone(response[1])
         
 
 def populate_db():
@@ -87,11 +86,13 @@ def populate_db():
     
 
 def clear_db():
-    Artwork.delete()
-    Artist.delete()
+    Artwork.delete().execute()
+    Artist.delete().execute()
 
 
 if __name__ == '__main__':
     db.connect()
     db.create_tables([Artist, Artwork])
     unittest.main()
+    clear_db()
+    db.close()
