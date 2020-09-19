@@ -175,8 +175,52 @@ class TestArtwork(unittest.TestCase):
         db_query = Artwork.select().where(Artwork.title == 'Haystacks')
         
         self.assertEqual(expected_message, response[0], 'Failed: add_artwork returned the wrong status message')
-        self.assertIsNone(response[1], 'Failed add_artwork returned rows when it shouldn\'t have')
+        self.assertIsNone(response[1], 'Failed: add_artwork returned rows when it shouldn\'t have')
         self.assertEqual(expected_rows_from_db_query, len(db_query), 'Failed: add_artwork added duplicate artist')
+        
+    # change an artist's email address
+    def test_update_email(self):
+        clear_db()
+        populate_db()
+        
+        new_email = 'fridas.new.email@hotmail.com'
+        update_email(artist_name='Frida Kahlo', email=new_email)
+        frida = Artist.select().where(Artist.name == 'Frida Kahlo')
+        
+        self.assertEqual(frida.email, new_email, 'Failed: update_email didn\'t update the email correctly')
+        
+    # change email for an artist not in db
+    def test_update_email_not_in_db(self):
+        clear_db()
+        
+        expected_message = 'No artist named Vincent Van Gogh'
+        expected_rows_from_db_query = 0
+        response = update_email(artist_name='Vincent Van Gogh', email='vinnie_goes@post.nl')
+        db_query = Artist.select().where(Artist.email == 'vinnie_goes@post.nl')
+        
+        self.assertEqual(expected_message, response[0], 'Failed: update_email returned the wrong message')
+        self.assertEqual(expected_rows_from_db_query, len(db_query), 
+                         'Failed: update_email updated an email address when the specified artist wasn\'t in db')
+    
+    # change availability of an artwork
+    def test_update_availability(self):
+        clear_db()
+        populate_db()
+        
+        update_availability(title='The Broken Column', available=True)
+        roots = Artwork.select().where(Artwork.title == 'Roots')
+        
+        self.assertTrue(roots.available, 'Failed: update_availability didn\'t update availability correctly')
+        
+    # change availability of artwork not in db
+    def test_update_availability_not_in_db(self):
+        clear_db()
+        
+        expected_message = 'No artwork titled "The Broken Column"'
+        expected_rows_from_db_query = 0
+        response = update_availability(title='The Broken Column', available=True)
+        
+        self.assertEqual(expected_message, response[0], 'Failed: update_availability returned the wrong message')
 
 
 # fill db with known values

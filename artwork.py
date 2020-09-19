@@ -188,7 +188,7 @@ def update_availability(title=None, available=None):
         return f'Updated availablity of "{title}" to {available_or_sold}', None
     
     else:
-        return f'No artwork titled {title}', None
+        return f'No artwork titled "{title}"', None
     
     
 def delete_artist(artist_name=None, override_warning=False):
